@@ -15,7 +15,7 @@ norm_offset_B = offset_B/variance_offset_B;
 
 % CROSS CORRELATION:
 
-% Below is the correlation for unnormalised vectors A & B
+% Below is the correlation for normalised vectors A & B
 
 length(A);
 padding = zeros(1,length(A)-1);
