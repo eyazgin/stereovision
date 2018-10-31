@@ -18,8 +18,10 @@ for n=1:length(A)+length(padding);
 end
 
 correlation_array
-max_correlation = max(correlation_array(:))
-[row,column] = find(ismember(correlation_array, max(correlation_array(:))))
+max_correlation = max(correlation_array(:));
+distance_moved = find(ismember(correlation_array, max(correlation_array(:))))
+
+distance_separation = abs(length(B)-distance_moved)
 
 % NORMALISED CROSS CORRELATION:
 
@@ -54,6 +56,8 @@ end
 
 correlation_array
 max_correlation = max(correlation_array(:))
-[row,column] = find(ismember(correlation_array, max(correlation_array(:))))
+distance_moved = find(ismember(correlation_array, max(correlation_array(:))))
 
 norm(correlation_array);
+
+distance_separation = abs(length(B)-distance_moved)
