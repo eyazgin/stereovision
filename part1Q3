@@ -1,0 +1,40 @@
+% NORMALISED CROSS CORRELATION:
+
+% Below is the correlation for normalised vectors A & B
+
+M = [0 0 1 1; 0 0 0 1; 0 0 0 0; 0 0 0 0]
+N = [0 0 0 0; 1 1 0 0; 0 1 0 0; 0 0 0 0]
+
+mean_M = (max(M(:))-min(M(:)))/2
+mean_N = (max(N(:))-min(N(:)))/2
+
+offset_M = M-min(M(:))-mean_M
+offset_N = N-min(N(:))-mean_N
+
+variance_offset_M = sqrt((((sum(offset_M.^2))))/length(M));
+variance_offset_N = sqrt((((sum(offset_N.^2))))/length(N));
+
+norm_offset_M = offset_M/variance_offset_M;
+norm_offset_N = offset_N/variance_offset_N;
+
+length(M)
+padding = zeros(length(M)-1,length(M)-1)
+padding_middletb = zeros(length(M)-1,length(M))
+padding_middlelr = zeros(length(M),length(M)-1)
+padded_norm_offset_M = [ padding padding_middletb padding ; padding_middlelr norm_offset_M padding_middlelr ; padding padding_middletb padding]
+padded_norm_offset_N = [ padding padding_middletb padding ; padding_middlelr norm_offset_N padding_middlelr ; padding padding_middletb padding]
+
+for n=1:length(M)+length(padding);
+    moving_offset_M = padded_norm_offset_M(n:length(padding)+n);
+    sum_moving_offset_M = sum(moving_offset_M.*norm_offset_N);
+    correlation_array(n) = [ sum_moving_offset_M ];
+    
+end
+
+correlation_array
+max_correlation = max(correlation_array(:))
+distance_moved = find(ismember(correlation_array, max(correlation_array(:))))
+
+norm(correlation_array);
+
+distance_separation = abs(length(N)-distance_moved)
