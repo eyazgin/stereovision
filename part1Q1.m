@@ -1,3 +1,30 @@
+% CROSS CORRELATION:
+
+% Below is the correlation for vectors A & B
+
+A = [0 0 1 1 0 0];
+B = [0 0 0 1 1 0];
+
+length(A);
+padding = zeros(1,length(A)-1);
+padded_A = [ padding , A , padding ];
+padded_B = [ padding , B , padding ];
+
+for n=1:length(A)+length(padding);
+    moving_A = padded_A(n:length(padding)+n);
+    sum_moving_A = sum(moving_A.*B);
+    correlation_array(n) = [ sum_moving_A ];
+    
+end
+
+correlation_array
+max_correlation = max(correlation_array(:))
+[row,column] = find(ismember(correlation_array, max(correlation_array(:))))
+
+% NORMALISED CROSS CORRELATION:
+
+% Below is the correlation for normalised vectors A & B
+
 A = [0 0 1 1 0 0];
 B = [0 0 0 1 1 0];
 
@@ -12,10 +39,6 @@ variance_offset_B = sqrt((((sum(offset_B.^2))))/length(B));
 
 norm_offset_A = offset_A/variance_offset_A;
 norm_offset_B = offset_B/variance_offset_B;
-
-% NORMALISED CROSS CORRELATION:
-
-% Below is the correlation for normalised vectors A & B
 
 length(A);
 padding = zeros(1,length(A)-1);
