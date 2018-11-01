@@ -42,9 +42,12 @@ padded_norm_offset_M = [ padding padding_middletb padding ; padding_middlelr nor
 
 for k=1:length_M+length_padding %moving sideways
     for l=1:height_M+height_padding %moving down
-        moving_offset_M = padded_norm_offset_M((l:height_padding+l),(k:length(padding)+k));
-        corellation_at_each_point = moving_offset_M.*norm_offset_N;
-        sum_moving_offset_M = sum(corellation_at_each_point(:));
+        moving_offset_M = padded_offset_M((l:height_padding+l),(k:length(padding)+k))
+            moving_offset_Msquared = moving_offset_M.^2;
+            variance_moving_offset_M = sqrt(((sum(moving_offset_Msquared(:))))/length_N);
+        norm_moving_offset_M = moving_offset_M/variance_moving_offset_M;
+        corellation_at_each_configuration = norm_moving_offset_M.*norm_offset_N
+        sum_moving_offset_M = sum(corellation_at_each_configuration(:))
         correlation_matrix(l,k) = sum_moving_offset_M;
     end  
 end
