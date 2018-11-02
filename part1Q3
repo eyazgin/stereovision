@@ -13,8 +13,8 @@
 M = [0 0 1 1 0 0; 0 0 0 1 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0];
 N = [0 0 0 0; 1 1 0 0; 0 1 0 0; 0 0 0 0];
 
-[length_M, height_M]=size(M);
-[length_N, height_N]=size(N);
+[height_M,length_M]=size(M);
+[height_N,length_N]=size(N);
 
 mean_M = (max(M(:))-min(M(:)))/2;
 mean_N = (max(N(:))-min(N(:)))/2;
@@ -31,8 +31,8 @@ variance_offset_N = sqrt(((sum(offset_Nsquared(:))))/length(N));
 norm_offset_M = offset_M/variance_offset_M;
 norm_offset_N = offset_N/variance_offset_N;
 
-padding = zeros(length_N-1,length_N-1);
-padding_middletb = zeros(length_N-1,length_M);
+padding = zeros(height_N-1,length_N-1);
+padding_middletb = zeros(length_N-1,height_M);
 padding_middlelr = zeros(height_M,length_N-1);
 padded_norm_offset_M = [ padding padding_middletb padding ; padding_middlelr norm_offset_M padding_middlelr ; padding padding_middletb padding];
 
@@ -42,7 +42,7 @@ padded_norm_offset_M = [ padding padding_middletb padding ; padding_middlelr nor
 
 for k=1:length_M+length_padding %moving sideways
     for l=1:height_M+height_padding %moving down
-        moving_offset_M = padded_offset_M((l:height_padding+l),(k:length(padding)+k))
+        moving_offset_M = padded_norm_offset_M((l:height_padding+l),(k:length(padding)+k))
             moving_offset_Msquared = moving_offset_M.^2;
             variance_moving_offset_M = sqrt(((sum(moving_offset_Msquared(:))))/length_N);
         norm_moving_offset_M = moving_offset_M/variance_moving_offset_M;
