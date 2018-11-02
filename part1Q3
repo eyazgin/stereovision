@@ -10,8 +10,8 @@
 % element has moved---which is the same distance that the whole matrix N
 % has moved---in order to get maximum correlation.
 
-M = [0 0 1 1 0 0; 0 0 0 1 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0];
-N = [0 0 0 0; 1 1 0 0; 0 1 0 0; 0 0 0 0];
+M = [0 0 1 1 0 0; 0 0 0 1 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0]
+N = [0 0 0 0; 1 1 0 0; 0 1 0 0]
 
 [height_M,length_M]=size(M);
 [height_N,length_N]=size(N);
@@ -32,22 +32,22 @@ norm_offset_M = offset_M/variance_offset_M;
 norm_offset_N = offset_N/variance_offset_N;
 
 padding = zeros(height_N-1,length_N-1);
-padding_middletb = zeros(length_N-1,height_M);
+padding_middletb = zeros(height_N-1,length_M);
 padding_middlelr = zeros(height_M,length_N-1);
 padded_norm_offset_M = [ padding padding_middletb padding ; padding_middlelr norm_offset_M padding_middlelr ; padding padding_middletb padding];
 
-[length_padding, height_padding]=size(padding);
-[length_padding_middletb, height_padding_middletb]=size(padding_middletb);
-[length_padding_middlelr, height_padding_middlelr]=size(padding_middlelr);
+[height_padding,length_padding]=size(padding);
+[height_padding_middletb,length_padding_middletb]=size(padding_middletb);
+[height_padding_middlelr,length_padding_middlelr]=size(padding_middlelr);
 
 for k=1:length_M+length_padding %moving sideways
     for l=1:height_M+height_padding %moving down
-        moving_offset_M = padded_norm_offset_M((l:height_padding+l),(k:length(padding)+k))
+        moving_offset_M = padded_norm_offset_M((l:height_padding+l),(k:length_padding+k));
             moving_offset_Msquared = moving_offset_M.^2;
             variance_moving_offset_M = sqrt(((sum(moving_offset_Msquared(:))))/length_N);
         norm_moving_offset_M = moving_offset_M/variance_moving_offset_M;
-        corellation_at_each_configuration = norm_moving_offset_M.*norm_offset_N
-        sum_moving_offset_M = sum(corellation_at_each_configuration(:))
+        corellation_at_each_configuration = norm_moving_offset_M.*norm_offset_N;
+        sum_moving_offset_M = sum(corellation_at_each_configuration(:));
         correlation_matrix(l,k) = sum_moving_offset_M;
     end  
 end
