@@ -10,8 +10,8 @@
 % element has moved---which is the same distance that the whole matrix N
 % has moved---in order to get maximum correlation.
 
-M = [0 0 1 1 0 0; 0 0 0 1 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0]
-N = [0 0 0 0; 1 1 0 0; 0 1 0 0]
+M = [0 0 1 1 0 0; 0 0 0 1 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0];
+N = [0 0 0 0; 1 1 0 0; 0 1 0 0];
 
 [height_M,length_M]=size(M);
 [height_N,length_N]=size(N);
@@ -40,23 +40,24 @@ padded_norm_offset_M = [ padding padding_middletb padding ; padding_middlelr nor
 [height_padding_middletb,length_padding_middletb]=size(padding_middletb);
 [height_padding_middlelr,length_padding_middlelr]=size(padding_middlelr);
 
-for k=1:length_M+length_padding %moving sideways
-    for l=1:height_M+height_padding %moving down
-        moving_offset_M = padded_norm_offset_M((l:height_padding+l),(k:length_padding+k));
+for k=1:length_M+length_padding; %moving sideways
+    for l=1:height_M+height_padding; %moving down
+            moving_offset_M = padded_norm_offset_M((l:height_padding+l),(k:length_padding+k));
             moving_offset_Msquared = moving_offset_M.^2;
             variance_moving_offset_M = sqrt(((sum(moving_offset_Msquared(:))))/length_N);
         norm_moving_offset_M = moving_offset_M/variance_moving_offset_M;
         corellation_at_each_configuration = norm_moving_offset_M.*norm_offset_N;
-        sum_moving_offset_M = sum(corellation_at_each_configuration(:));
-        correlation_matrix(l,k) = sum_moving_offset_M;
+        sum_moving_offset_M(k,l) = sum(corellation_at_each_configuration(:));
+        correlation = sum_moving_offset_M;
+        
     end  
 end
 
-correlation_matrix
-max_correlation = max(correlation_matrix(:))
-[verdist,hordist] = find(ismember(correlation_matrix, max(correlation_matrix(:))))
+correlation
+max_correlation = max(correlation(:))
+[verdist,hordist] = find(ismember(correlation, max(correlation(:))))
 
-norm(correlation_matrix);
+norm(correlation);
 
 horsep = hordist - 1
 versep = verdist - 1
