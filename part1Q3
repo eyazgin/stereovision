@@ -47,7 +47,7 @@ for k=1:length_M+length_padding; %moving sideways
             variance_moving_offset_M = sqrt(((sum(moving_offset_Msquared(:))))/length_N);
         norm_moving_offset_M = moving_offset_M/variance_moving_offset_M;
         corellation_at_each_configuration = norm_moving_offset_M.*norm_offset_N;
-        sum_moving_offset_M(k,l) = sum(corellation_at_each_configuration(:));
+        sum_moving_offset_M(l,k) = sum(corellation_at_each_configuration(:));
         correlation = sum_moving_offset_M;
         
     end  
