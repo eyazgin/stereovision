@@ -1,0 +1,7 @@
+% Defining the Gaussian
+
+x=linspace(0,30,1000);
+y=x';               
+[X,Y]=meshgrid(x,y);
+gaussian=300*exp(-((X-15).^2+(Y-15).^2)/50);
+surf(x,y,z);shading interp
