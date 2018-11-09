@@ -1,38 +1,57 @@
-signal_1 = A = fscanf(fileID,formatSpec,sizeA)
-signal_2 = B = fscanf(fileID,formatSpec,sizeA)
+% NORMALISED 2D CROSS CORRELATION:
 
-mean_A = (max(A) - min(A))/2;
-mean_B = (max(B) - min(B))/2;
+% Below is the correlation for normalised matrices M & N, where we are
+% trying to find N inside M ....
 
-offset_A = A - min(A) - mean_A;
-offset_B = B - min(B) - mean_B;
+% The way that the algorith is set up, we begin with the bottom-right
+% element of N being compared with the top-left element of M and then
+% moving N to the right and down over M. Therefore, the horizontal and
+% vertical separation (horsep and versep respectively) reveal how far that
+% element has moved---which is the same distance that the whole matrix N
+% has moved---in order to get maximum correlation.
 
-variance_offset_A = sqrt((((sum(offset_A.^2))))/length(A));
-variance_offset_B = sqrt((((sum(offset_B.^2))))/length(B));
+M = [0 0 1 1 0 0; 0 0 0 1 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0];
+N = [0 0 0 0; 1 1 0 0; 0 1 0 0];
 
-norm_offset_A = offset_A/variance_offset_A;
-norm_offset_B = offset_B/variance_offset_B;
+[height_M,length_M]=size(M);
+[height_N,length_N]=size(N);
 
-% CROSS CORRELATION:
+mean_M = (1/numel(M))*sum(M(:))
+mean_N = (1/numel(N))*sum(N(:))
 
-% Below is the correlation for unnormalised vectors A & B
+offset_M = M-mean_M
+offset_N = N-mean_N
 
-length(A);
-padding = zeros(1,length(A)-1);
-padded_norm_offset_A = [ padding , norm_offset_A , padding ];
-padded_norm_offset_B = [ padding , norm_offset_B , padding ];
+std_M = std(M(:))
+std_N = std(N(:))
 
-for n=1:length(A)+length(padding);
-    moving_offset_A = padded_norm_offset_A(n:length(padding)+n);
-    sum_moving_offset_A = sum(moving_offset_A.*norm_offset_B);
-    correlation_array(n) = [ sum_moving_offset_A ];
-    
+norm_offset_M = offset_M/std_M
+norm_offset_N = offset_N/std_N
+
+padding = zeros(height_N-1,length_N-1);
+padding_middletb = zeros(height_N-1,length_M);
+padding_middlelr = zeros(height_M,length_N-1);
+padded_norm_offset_M = [ padding padding_middletb padding ; padding_middlelr norm_offset_M padding_middlelr ; padding padding_middletb padding];
+
+[height_padding,length_padding]=size(padding);
+[height_padding_middletb,length_padding_middletb]=size(padding_middletb);
+[height_padding_middlelr,length_padding_middlelr]=size(padding_middlelr);
+
+for k=1:length_M+length_padding; %moving sideways
+    for l=1:height_M+height_padding; %moving down
+            moving_offset_M = padded_norm_offset_M((l:height_padding+l),(k:length_padding+k));
+        corellation_at_each_configuration = moving_offset_M.*offset_N;
+        sum_moving_offset_M(k,l) = (1/numel(N))*sum(corellation_at_each_configuration(:));
+        correlation = sum_moving_offset_M;
+        
+    end  
 end
 
-correlation_array
-max_correlation = max(correlation_array(:))
-[row,column] = find(ismember(correlation_array, max(correlation_array(:))))
+correlation
+max_correlation = max(correlation(:))
+[verdist,hordist] = find(ismember(correlation, max(correlation(:))))
 
-% NORMALISED CROSS CORRELATION:
+norm(correlation)
 
-norm(correlation_array);
+horsep = hordist - 1
+versep = verdist - 1
