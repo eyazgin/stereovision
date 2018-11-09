@@ -1,0 +1,20 @@
+cal_left_1900 = rgb2gray(imread('cal_image_left_1900.tiff'));
+
+[height_matrix,width_matrix] = size(cal_left_1900);
+
+x=linspace(0,30,30);
+y=x';               
+[X,Y]=meshgrid(x,y);
+gaussian = 300*exp(-((X-15).^2+(Y-15).^2)/50);
+% surf(x,y,gaussian);shading interp
+
+cal_left_1900_corr = normxcorr2(gaussian,cal_left_1900);
+
+% figure, surf(cal_left_1900_corr), shading flat
+
+% [ipeak, jpeak] = find(cal_left_1900_corr=
+
+region_of_dot1 = cal_left_1900_corr(1:200,1:450);
+
+max(region_of_dot1(:))
+[row, col] = find(ismember(region_of_dot1, max(region_of_dot1(:))))
