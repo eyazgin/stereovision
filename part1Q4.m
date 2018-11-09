@@ -1,4 +1,4 @@
-RGB_rocket_man = imread('wallypuzzle_rocket_man.png');
+RGB_rocket_man = single(imread('wallypuzzle_rocket_man.png'));
 R_rocket_man = RGB_rocket_man(:,:,1);
 G_rocket_man = RGB_rocket_man(:,:,2);
 B_rocket_man = RGB_rocket_man(:,:,3);
@@ -11,7 +11,7 @@ grey_rocket_man = 0.2989*R_rocket_man + 0.5870*G_rocket_man + 0.1140*B_rocket_ma
 % imagetoshow = mat2gray(grey_rocket_man);
 % imshow(imagetoshow);
 
-RGB_puzzle = imread('wallypuzzle_png.png');
+RGB_puzzle = single(imread('wallypuzzle_small.png'));
 R_puzzle = RGB_puzzle(:,:,1);
 G_puzzle = RGB_puzzle(:,:,2);
 B_puzzle = RGB_puzzle(:,:,3);
@@ -27,20 +27,17 @@ N = grey_rocket_man;
 [height_M,length_M]=size(M);
 [height_N,length_N]=size(N);
 
-mean_M = (max(M(:))-min(M(:)))/2;
-mean_N = (max(N(:))-min(N(:)))/2;
+mean_M = (1/numel(M))*sum(M(:));
+mean_N = (1/numel(N))*sum(N(:));
 
-offset_M = M-min(M(:))-mean_M;
-offset_N = N-min(N(:))-mean_N;
+offset_M = M-mean_M;
+offset_N = N-mean_N;
 
-offset_Msquared = offset_M.^2;
-offset_Nsquared = offset_N.^2;
+std_M = std(M(:));
+std_N = std(N(:));
 
-variance_offset_M = sqrt(((sum(offset_Msquared(:))))/length(M));
-variance_offset_N = sqrt(((sum(offset_Nsquared(:))))/length(N));
-
-norm_offset_M = offset_M/variance_offset_M;
-norm_offset_N = offset_N/variance_offset_N;
+norm_offset_M = offset_M/std_M;
+norm_offset_N = offset_N/std_N;
 
 padding = zeros(height_N-1,length_N-1);
 padding_middletb = zeros(height_N-1,length_M);
@@ -54,21 +51,40 @@ padded_norm_offset_M = [ padding padding_middletb padding ; padding_middlelr nor
 for k=1:length_M+length_padding; %moving sideways
     for l=1:height_M+height_padding; %moving down
             moving_offset_M = padded_norm_offset_M((l:height_padding+l),(k:length_padding+k));
-            moving_offset_Msquared = moving_offset_M.^2;
-            variance_moving_offset_M = sqrt(((sum(moving_offset_Msquared(:))))/length_N);
-        norm_moving_offset_M = moving_offset_M/variance_moving_offset_M;
-        corellation_at_each_configuration = norm_moving_offset_M.*norm_offset_N;
-        sum_moving_offset_M(k,l) = sum(corellation_at_each_configuration(:));
+        corellation_at_each_configuration = moving_offset_M.*offset_N;
+        sum_moving_offset_M(k,l) = (1/numel(M))*sum(corellation_at_each_configuration(:));
         correlation = sum_moving_offset_M;
         
     end  
 end
 
-correlation;
-max_correlation = max(correlation(:));
+% We now find the position of the bottom-right corner of the Rocket Man
+% image inside the puzzle image at highest correlation
+
+correlation
+max_correlation = max(correlation(:))
 [verdist,hordist] = find(ismember(correlation, max(correlation(:))))
 
-norm(correlation);
+% With the information of the position of highest correlation, we now expand out from 
+% that corner to generate a matrix of the same dimensions of  the rocket
+% man image---this will frame the location of the rocket man inside the
+% puzzle image. Showing the result.....
 
-horsep = hordist - 1
-versep = verdist - 1
+RGB_puzzle_image = imread('wallypuzzle_small.png');
+R_puzzle_image = RGB_puzzle_image(:,:,1);
+G_puzzle_image = RGB_puzzle_image(:,:,2);
+B_puzzle_image = RGB_puzzle_image(:,:,3);
+
+grey_puzzle_image = 0.2989*R_puzzle_image + 0.5870*G_puzzle_image + 0.1140*B_puzzle_image;
+
+RGB_rocket_man_image = imread('wallypuzzle_rocket_man.png');
+R_rocket_man_image = RGB_rocket_man_image(:,:,1);
+G_rocket_man_image = RGB_rocket_man_image(:,:,2);
+B_rocket_man_image = RGB_rocket_man_image(:,:,3);
+
+grey_rocket_man_image = 0.2989*R_rocket_man_image + 0.5870*G_rocket_man_image + 0.1140*B_rocket_man_image;
+
+[rocketman_height,rocketman_width] = size(grey_rocket_man_image)
+
+rocketman_inside = grey_puzzle(vertdist-rocketman_height:verdist,hordist-rocketman_width:verdist)
+figure = imshow(rocketman_inside)
