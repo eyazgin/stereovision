@@ -1,0 +1,19 @@
+% FFT cross-correlation of signals
+
+fileID = fopen('sensor1_data_general.txt','r');
+formatSpec = '%f';
+signal_1 = fscanf(fileID,formatSpec);
+
+fileID = fopen('sensor2_data_general.txt','r');
+formatSpec = '%f';
+signal_2 = fscanf(fileID,formatSpec);
+
+sig_1_fft = fft(signal_1);
+sig_2_fft = fft(signal_2);
+
+convulution_sig1_2 = conj(sig_1_fft).*sig_2_fft;
+
+correlation_sig1_2 = ifft(convulution_sig1_2)
+
+max_correlation = max(correlation_sig1_2(:));
+distance_moved = find(ismember(correlation_sig1_2, max(correlation_sig1_2(:))))
