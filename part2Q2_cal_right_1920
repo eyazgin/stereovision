@@ -1,0 +1,47 @@
+cal_left_1920 = rgb2gray(imread('cal_image_left_1920.tiff'));
+
+[height_matrix,width_matrix] = size(cal_left_1920);
+
+x=linspace(0,30,30);
+y=x';               
+[X,Y]=meshgrid(x,y);
+gaussian = 300*exp(-((X-15).^2+(Y-15).^2)/50);
+% surf(x,y,gaussian);shading interp
+
+cal_left_1920_corr = normxcorr2(gaussian,cal_left_1920);
+
+% figure, surf(cal_left_1920_corr), shading flat
+
+% region_of_dot1 = cal_left_1920_corr(1:200,1:400);
+% 
+% max(region_of_dot1(:));
+% [row_1, col_1] = find(ismember(region_of_dot1, max(region_of_dot1(:))));
+
+for m=1:22
+
+    for n=1:17
+        n;
+        m;
+        dot_number_incolumn(n) = n;
+        column_number(m) = m;
+        dot_number = n + (m-1)*17;
+
+        region_of_dot_nm = cal_left_1920_corr(80+round(((m-1)*2.65),0)+(n-1)*89:(80+round(((m-1)*2.65),0)+n*89),397+round(((m-1)*(93-(m-1)*(12/19))),0):397+round(((m)*(93-(m)*(12/19))),0));
+
+        max(region_of_dot_n(:));
+        [row, col] = find(ismember(region_of_dot_nm, max(region_of_dot_nm(:))));
+        row_ = row+80+round(((m-1)*2.65),0)+(n-1)*89-1;
+        col_ = col+397+round((m-1)*(93-(m-1)*(12/19))-1,0);
+
+%         figure_2(n,m) = surf(region_of_dot_nm), shading flat;
+
+        list_dots_i(dot_number) = row_;
+        list_dots_j(dot_number) = col_;
+        
+    end
+   
+end
+
+list_dots = [list_dots_i' list_dots_j']
+
+% plot(list_dots_i())
